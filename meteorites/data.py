@@ -6,5 +6,6 @@ WIN_HIGHT = 600
 FRAME_RATE = 60
 
 class Mode(Enum):
-    STOP = 0
+    START = 0
     RUNNING = 1
+    OVER = 2
