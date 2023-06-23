@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 import data
+import utils
 
 class Meteorites:
     def __init__(self):
@@ -9,6 +10,11 @@ class Meteorites:
         pygame.display.set_caption("Meteorites")
         self.clock = pygame.time.Clock()
         self.mode = data.Mode.STOP
+        self.__load_sprites()
+        
+    def __load_sprites(self):
+        self.background = utils.load_sprite("Backgrounds/blue")
+        self.background = pygame.transform.scale(self.background, (data.WIN_WIDTH, data.WIN_HIGHT))
         
     def main_loop(self):
         while True:
@@ -26,6 +32,7 @@ class Meteorites:
         pass
     
     def __update_screen(self):
+        self.screen.blit(self.background, (0,0))
         pygame.display.update()
         self.clock.tick(60)
         
