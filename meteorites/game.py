@@ -19,7 +19,7 @@ class Meteorites:
         self.__load_sprites()
         
     def __load_sprites(self):
-        pass
+        self.player = models.Player()
         
     def main_loop(self):
         while True:
@@ -50,8 +50,13 @@ class Meteorites:
     
     def __update_screen(self):
         self.screen.blit(self.background, (0,0))
+        
         if self.mode == data.Mode.START:
             self.screen.blit(self.start_text, self.start_text_rect)
+            
+        elif self.mode == data.Mode.RUNNING:
+            self.player.draw(self.screen)
+            
         pygame.display.update()
         self.clock.tick(data.FRAME_RATE)
         
