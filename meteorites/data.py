@@ -9,6 +9,7 @@ FRAME_RATE = 60
 # player
 DEACCELERATION = 0.95
 ROTATION_SPEED = 4
+UP = Vector2(0, -0.5)
 
 class Mode(Enum):
     START = 0
