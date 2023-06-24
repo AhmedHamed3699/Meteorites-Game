@@ -19,7 +19,7 @@ class Meteorites:
         self.__load_sprites()
         
     def __load_sprites(self):
-        self.player = models.Player()
+        self.player = models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2))
         
     def main_loop(self):
         while True:
@@ -44,6 +44,7 @@ class Meteorites:
     
     def __game_logic(self):
         self.background.fill((0, 0, 0))
+        self.player.move()
     
     def __over_menu(self):
         self.background.fill((118, 38, 0))
