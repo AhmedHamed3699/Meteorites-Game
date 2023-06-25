@@ -9,7 +9,12 @@ FRAME_RATE = 80
 # player
 DEACCELERATION = 0.95
 ROTATION_SPEED = 4
-UP = Vector2(0, -0.5)
+PLAYER_SPEED = 0.5
+UP = Vector2(0, -1)
+
+# meteorites
+ENEMIES_FREQ = 400 # ms
+OFF_SCREEN = 50
 
 class Mode(Enum):
     START = 0
