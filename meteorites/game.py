@@ -1,7 +1,7 @@
 import pygame
 from sys import exit
 import data
-from utils import load_sprite
+from utils import collision_check
 import models
 
 class Meteorites:
@@ -16,10 +16,12 @@ class Meteorites:
         self.font = pygame.font.Font("assets/Font/kenvector_future.ttf", 28)
         self.start_text = self.font.render("Press SPACE to start", True, (255, 255, 255))
         self.start_text_rect = self.start_text.get_rect(center = (data.WIN_WIDTH//2, data.WIN_HIGHT//2))
-        self.__load_sprites()
-        
-    def __load_sprites(self):
-        self.player = models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2))
+        self.player = pygame.sprite.GroupSingle()
+        self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
+        self.obstacles_group = pygame.sprite.Group()
+        self.obstacles_timer = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.obstacles_timer, data.ENEMIES_FREQ)
+
         
     def main_loop(self):
         while True:
@@ -41,10 +43,16 @@ class Meteorites:
             if self.mode == data.Mode.START:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.mode = data.Mode.RUNNING
+                    
+            if self.mode == data.Mode.RUNNING:
+                if event.type == self.obstacles_timer:
+                    self.obstacles_group.add(models.Meteorite())
+                
     
     def __game_logic(self):
         self.background.fill((0, 0, 0))
-        self.player.move()
+        if collision_check(self.player.sprite, self.obstacles_group):
+            self.mode = data.Mode.OVER
     
     def __over_menu(self):
         self.background.fill((118, 38, 0))
@@ -56,7 +64,8 @@ class Meteorites:
             self.screen.blit(self.start_text, self.start_text_rect)
             
         elif self.mode == data.Mode.RUNNING:
-            self.player.draw(self.screen)
+            self.player.update(self.screen)
+            self.obstacles_group.update(self.screen)
             
         pygame.display.update()
         self.clock.tick(data.FRAME_RATE)
