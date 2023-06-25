@@ -19,6 +19,9 @@ class AdvavcedSprite(sprite.Sprite):
         
     def draw(self, surface):
         surface.blit(self.image, self.pos - math.Vector2(self.radius))
+        
+    def collide(self, other):
+        return (self.pos - other.pos).length() < (self.radius + other.radius)
     
     
 class Player(AdvavcedSprite):
@@ -60,7 +63,8 @@ class Player(AdvavcedSprite):
        
     def __draw(self, surface):
         rotated_surf = transform.rotozoom(self.image, self.dir.angle_to(math.Vector2(0, -1)), 1.0)
-        surface.blit(rotated_surf, self.pos - math.Vector2(rotated_surf.get_width()//2))
+        new_radius = rotated_surf.get_width()//2
+        surface.blit(rotated_surf, self.pos - math.Vector2(new_radius))
         
     def update(self, surface):
         self.__draw(surface)

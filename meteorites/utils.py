@@ -7,3 +7,9 @@ def load_sprite(name: str, alpha=False):
     else: sprite.convert_alpha()
     
     return sprite
+
+def collision_check(sprite, group):
+    for target in group:
+        if sprite.collide(target):
+            return True
+    return False
