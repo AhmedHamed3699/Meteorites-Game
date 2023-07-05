@@ -23,9 +23,10 @@ class AdvavcedSprite(sprite.Sprite):
     def _draw(self, surface):
         surface.blit(self.image, self.rect)
         
+    # OFF_SCREEN is multiplied by 2. Because if not, the sprite may be destroyed immediately after it is created    
     def _destroy(self):
-        if (self.pos.x > data.WIN_WIDTH + data.OFF_SCREEN or self.pos.x < -data.OFF_SCREEN) or ( 
-            self.pos.y > data.WIN_HIGHT + data.OFF_SCREEN or self.pos.y < -data.OFF_SCREEN):
+        if (self.pos.x > data.WIN_WIDTH + 2*data.OFF_SCREEN or self.pos.x < -2*data.OFF_SCREEN) or ( 
+            self.pos.y > data.WIN_HIGHT + 2*data.OFF_SCREEN or self.pos.y < -2*data.OFF_SCREEN):
             self.kill()
             
     def update(self, surface):
@@ -95,20 +96,36 @@ class Meteorite(AdvavcedSprite):
     def __init__(self, scale=1):
         obst_type = str(randint(1, 6))
         name = "Meteors/meteorBrown_" + obst_type
-        x = (choice([-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN]), randint(-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN))
-        y = (randint(-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN), choice([-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN]))
+        
+        # I made x1, x2, x and the same for y, 
+        # because I wanted to increase the probability of the meteorite appearing in the middle of the screen
+        x1 = (choice([-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN]), randint(-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN))
+        x2 = (choice([-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN]), randint(-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN))
+        x = x1 if abs(x1[1] - data.WIN_HIGHT//2) < abs(x2[1] - data.WIN_HIGHT//2) else x2
+
+        y1 = (randint(-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN), choice([-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN]))
+        y2 = (randint(-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN), choice([-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN]))
+        y = y1 if abs(y1[0] - data.WIN_WIDTH//2) < abs(y2[0] - data.WIN_WIDTH//2) else y2
+        
         c = choice([x,y])
         pos = (c)
-        vel = data.UP * randint(2, 4)
+        vel = data.UP
+        
+        
+        def rand(start, end, pos):
+            return randint(max(start, pos - data.OFF_SCREEN_RANGE), min(end, pos + data.OFF_SCREEN_RANGE)) - pos
         
         if pos[0] < 0:
-            vel.rotate_ip(randint(50, 130))
+            vel.update(math.Vector2(0 - pos[0], rand(0,data.WIN_HIGHT, pos[1])))
         elif pos[0] > data.WIN_WIDTH:
-            vel.rotate_ip(randint(-130, 50))
+            vel.update(math.Vector2(data.WIN_WIDTH - pos[0], rand(0, data.WIN_HIGHT, pos[1])))
         elif pos[1] < 0:
-            vel.rotate_ip(randint(-40, 40))
+            vel.update(math.Vector2(rand(0, data.WIN_WIDTH, pos[0]), 0 - pos[1]))
         elif pos[1] > data.WIN_HIGHT:
-            vel.rotate_ip(randint(120, 240))
+            vel.update(math.Vector2(rand(0, data.WIN_WIDTH, pos[0]), data.WIN_HIGHT - pos[1]))
+        
+        vel.scale_to_length(1)    
+        vel *= randint(data.MIN_SPEED, data.MAX_SPEED)    
             
         super().__init__(name=name, scale=scale, pos=pos, vel=vel)
         
