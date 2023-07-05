@@ -14,7 +14,10 @@ UP = Vector2(0, -1)
 
 # meteorites
 ENEMIES_FREQ = 1000 # ms
+MAX_SPEED = 5
+MIN_SPEED = 2
 OFF_SCREEN = 50
+OFF_SCREEN_RANGE = 50
 
 # bullets
 BULLET_SPEED = 20
