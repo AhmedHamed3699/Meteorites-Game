@@ -1,7 +1,7 @@
 import pygame
 from sys import exit
 import data
-from utils import collision_check
+from utils import collision_check, bullet_collision_check
 import models
 
 class Meteorites:
@@ -16,6 +16,7 @@ class Meteorites:
         self.font = pygame.font.Font("assets/Font/kenvector_future.ttf", 28)
         self.start_text = self.font.render("Press SPACE to start", True, (255, 255, 255))
         self.start_text_rect = self.start_text.get_rect(center = (data.WIN_WIDTH//2, data.WIN_HIGHT//2))
+        self.bullets_group = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
         self.obstacles_group = pygame.sprite.Group()
@@ -44,13 +45,16 @@ class Meteorites:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.mode = data.Mode.RUNNING
                     
-            if self.mode == data.Mode.RUNNING:
+            elif self.mode == data.Mode.RUNNING:
                 if event.type == self.obstacles_timer:
                     self.obstacles_group.add(models.Meteorite())
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    self.bullets_group.add(self.player.sprite.shoot())
                 
     
     def __game_logic(self):
         self.background.fill((0, 0, 0))
+        bullet_collision_check(self.bullets_group, self.obstacles_group)
         if collision_check(self.player.sprite, self.obstacles_group):
             self.mode = data.Mode.OVER
     
@@ -66,6 +70,7 @@ class Meteorites:
         elif self.mode == data.Mode.RUNNING:
             self.player.update(self.screen)
             self.obstacles_group.update(self.screen)
+            self.bullets_group.update(self.screen)
             
         pygame.display.update()
         self.clock.tick(data.FRAME_RATE)
