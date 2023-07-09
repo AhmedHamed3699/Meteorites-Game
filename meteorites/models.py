@@ -2,7 +2,7 @@ from random import randint
 from pygame import sprite, transform, key, math
 import pygame
 import data
-from utils import load_sprite, random_init
+from utils import load_sprite, load_sound, random_init
 
 
 class AdvavcedSprite(sprite.Sprite):
@@ -13,7 +13,7 @@ class AdvavcedSprite(sprite.Sprite):
         self.vel = math.Vector2(vel)
         self.name = name
         self.image = load_sprite("Sprite/" + name, True)
-        self.image = transform.scale_by(self.image, scale)
+        self.image = transform.rotozoom(self.image, 0, scale)
         self.mask = pygame.mask.from_surface(self.image)
         self.radius = self.image.get_width()//2
         self.rect = self.image.get_rect(center = self.pos)
@@ -41,6 +41,7 @@ class Player(AdvavcedSprite):
     def __init__(self, pos, name="Player_Ships/playerShip3_red", scale=data.PLAYER_SCALE):
         super().__init__(name=name, scale=scale, pos=pos, vel=math.Vector2(0, 0))
         self.dir = data.UP * data.PLAYER_SPEED
+        self.shoot_sound = load_sound("sfx_laser1")
     
     
     def __input_handle(self):
@@ -78,6 +79,7 @@ class Player(AdvavcedSprite):
         bullet_vel = self.dir * data.BULLET_SPEED + self.vel
         bullet_pos = self.pos + self.dir.normalize() * self.radius
         bullet = Bullet(bullet_pos, bullet_vel)
+        self.shoot_sound.play()
         return bullet
         
        
