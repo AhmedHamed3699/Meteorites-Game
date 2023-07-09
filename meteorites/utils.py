@@ -1,5 +1,6 @@
 from pygame.image import load
 from pygame.sprite import collide_mask
+from pygame.mixer import Sound
 from pygame import math
 from random import randint, choice
 import data
@@ -11,6 +12,12 @@ def load_sprite(name: str, alpha=False):
     else: sprite.convert_alpha()
     
     return sprite
+
+def load_sound(name: str):
+    sound = Sound(f"assets/Sound/{name}.mp3")
+    sound.set_volume(data.SOUND_VOLUME)
+    return sound
+    
 
 # it is made to get the position and velocity of the meteorite at the beginning of the game
 def random_init():
