@@ -54,7 +54,14 @@ class Meteorites:
     
     def __game_logic(self):
         self.background.fill((0, 0, 0))
-        bullet_collision_check(self.bullets_group, self.obstacles_group)
+        
+        destroyed_obstacle = bullet_collision_check(self.bullets_group, self.obstacles_group)
+        if destroyed_obstacle:
+            new_obstacles = destroyed_obstacle.split()
+            if new_obstacles:
+                self.obstacles_group.add(new_obstacles)
+            destroyed_obstacle.kill()
+            
         if collision_check(self.player.sprite, self.obstacles_group):
             self.mode = data.Mode.OVER
     
