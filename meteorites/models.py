@@ -1,15 +1,17 @@
-from random import randint, choice
+from random import randint
 from pygame import sprite, transform, key, math
 import pygame
 import data
-from utils import load_sprite
+from utils import load_sprite, random_init
 
 
 class AdvavcedSprite(sprite.Sprite):
     def __init__(self, name: str, scale, pos, vel):
         super().__init__()
+        self.scale = scale
         self.pos = math.Vector2(pos)
         self.vel = math.Vector2(vel)
+        self.name = name
         self.image = load_sprite("Sprite/" + name, True)
         self.image = transform.scale_by(self.image, scale)
         self.mask = pygame.mask.from_surface(self.image)
@@ -36,7 +38,7 @@ class AdvavcedSprite(sprite.Sprite):
     
     
 class Player(AdvavcedSprite):
-    def __init__(self, pos, name="Player_Ships/playerShip3_red", scale=0.65):
+    def __init__(self, pos, name="Player_Ships/playerShip3_red", scale=data.PLAYER_SCALE):
         super().__init__(name=name, scale=scale, pos=pos, vel=math.Vector2(0, 0))
         self.dir = data.UP * data.PLAYER_SPEED
     
@@ -93,41 +95,22 @@ class Player(AdvavcedSprite):
         
 
 class Meteorite(AdvavcedSprite):
-    def __init__(self, scale=1):
-        obst_type = str(randint(1, 6))
-        name = "Meteors/meteorBrown_" + obst_type
-        
-        # I made x1, x2, x and the same for y, 
-        # because I wanted to increase the probability of the meteorite appearing in the middle of the screen
-        x1 = (choice([-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN]), randint(-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN))
-        x2 = (choice([-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN]), randint(-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN))
-        x = x1 if abs(x1[1] - data.WIN_HIGHT//2) < abs(x2[1] - data.WIN_HIGHT//2) else x2
-
-        y1 = (randint(-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN), choice([-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN]))
-        y2 = (randint(-data.OFF_SCREEN, data.WIN_WIDTH + data.OFF_SCREEN), choice([-data.OFF_SCREEN, data.WIN_HIGHT + data.OFF_SCREEN]))
-        y = y1 if abs(y1[0] - data.WIN_WIDTH//2) < abs(y2[0] - data.WIN_WIDTH//2) else y2
-        
-        c = choice([x,y])
-        pos = (c)
-        vel = data.UP
-        
-        
-        def rand(start, end, pos):
-            return randint(max(start, pos - data.OFF_SCREEN_RANGE), min(end, pos + data.OFF_SCREEN_RANGE)) - pos
-        
-        if pos[0] < 0:
-            vel.update(math.Vector2(0 - pos[0], rand(0,data.WIN_HIGHT, pos[1])))
-        elif pos[0] > data.WIN_WIDTH:
-            vel.update(math.Vector2(data.WIN_WIDTH - pos[0], rand(0, data.WIN_HIGHT, pos[1])))
-        elif pos[1] < 0:
-            vel.update(math.Vector2(rand(0, data.WIN_WIDTH, pos[0]), 0 - pos[1]))
-        elif pos[1] > data.WIN_HIGHT:
-            vel.update(math.Vector2(rand(0, data.WIN_WIDTH, pos[0]), data.WIN_HIGHT - pos[1]))
-        
-        vel.scale_to_length(1)    
-        vel *= randint(data.MIN_SPEED, data.MAX_SPEED)    
+    def __init__(self, name="", scale=1, pos=None, vel=None):
+        if pos is None or vel is None:
+            obst_type = str(randint(1, 4))
+            name = "Meteors/meteorBrown_" + obst_type
+            pos, vel = random_init()
+        else:
+            vel.rotate_ip(randint(-180, 180))
             
         super().__init__(name=name, scale=scale, pos=pos, vel=vel)
+        
+        
+    def split(self):
+        if self.scale > 0.25:
+            return [Meteorite(self.name, self.scale/2, self.pos, self.vel), Meteorite(self.name, self.scale/2, self.pos, self.vel)]
+        else:
+            return []
         
 
 class Bullet(AdvavcedSprite):
