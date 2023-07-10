@@ -1,4 +1,5 @@
 from random import randint
+from typing import Any
 from pygame import sprite, transform, key, math
 import pygame
 import data
@@ -84,7 +85,7 @@ class Player(AdvavcedSprite):
         
        
     def __draw(self, surface):
-        rotated_surf = transform.rotozoom(self.image, self.dir.angle_to(math.Vector2(0, -1)), 1.0)
+        rotated_surf = transform.rotozoom(self.image, self.dir.angle_to(data.UP), 1.0)
         self.radius = rotated_surf.get_width()//2
         self.mask = pygame.mask.from_surface(rotated_surf)
         self.rect = rotated_surf.get_rect(center = self.pos)
@@ -130,15 +131,13 @@ class Bullet(AdvavcedSprite):
         self.__draw(surface)
         self._move()
         self._destroy()
-        
 
-class Explosion(sprite.Sprite):
-    pass
 
-class MeteoriteExplosion(sprite.Sprite):
-    pass
-
-class PlayerExplosion(sprite.Sprite):
-    pass
-
+class PlayerStart(sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self.image = load_sprite("Sprite/Player_Ships/playerShip3_red", True)
+        self.image = transform.rotozoom(self.image, 0, data.PLAYER_START_SIZE)
+        self.rect = self.image.get_rect(center = pos)
+        self.pos = pos
 
