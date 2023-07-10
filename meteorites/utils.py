@@ -1,6 +1,7 @@
 from pygame.image import load
 from pygame.sprite import collide_mask
 from pygame.mixer import Sound
+from pygame.transform import rotozoom
 from pygame import math
 from random import randint, choice
 import data
@@ -18,7 +19,6 @@ def load_sound(name: str):
     sound.set_volume(data.SOUND_VOLUME)
     return sound
     
-
 # it is made to get the position and velocity of the meteorite at the beginning of the game
 def random_init():
     # I made x1, x2, x and the same for y, 
@@ -33,8 +33,7 @@ def random_init():
     
     c = choice([x,y])
     pos = (c)
-    vel = data.UP
-    
+    vel = data.UP*1
     
     def rand(start, end, pos):
         return randint(max(start, pos - data.OFF_SCREEN_RANGE), min(end, pos + data.OFF_SCREEN_RANGE)) - pos
@@ -60,9 +59,31 @@ def collision_check(sprite, group):
     return False
 
 def bullet_collision_check(bullets, obstacles):
+
     for bullet in bullets:
         for target in obstacles:
             if collide_mask(bullet, target):
                 bullet.kill()
                 return target
     return None
+
+
+def print_text(surface, text, font, place='c', pos=(data.WIN_WIDTH//2, data.WIN_HIGHT//2), move=(0,0), color=(255, 255, 255), size=1.0):
+    text_surf = font.render(text, True, color)
+    text_surf = rotozoom(text_surf, 0, size)
+    text_rect = text_surf.get_rect()
+    
+    if place == 'tl':
+        text_rect.topleft = pos
+    elif place == 'mt':
+        text_rect.midtop = pos
+    elif place == 'mb':
+        text_rect.midbottom = pos
+    else:
+        text_rect.center = pos
+        
+    text_rect.move_ip(move)
+        
+    surface.blit(text_surf, text_rect)
+    
+    return text_rect
