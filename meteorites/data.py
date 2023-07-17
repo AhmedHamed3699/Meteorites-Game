@@ -17,6 +17,7 @@ FONT_SIZE = 50
 
 SCORE_DIVIDER = 1000
 SCORE_OFFSET = 20
+HIGH_SCORE_FILE = "data/high_score.txt"
 
 # player
 PLAYER_SCALE = 0.65
@@ -27,6 +28,7 @@ UP = Vector2(0, -1)
 
 # meteorites
 ENEMIES_FREQ = 1500 # ms
+OBSTACLES_DEFAULT_SIZE = 1
 MAX_SPEED = 3
 MIN_SPEED = 1
 OFF_SCREEN = 50
