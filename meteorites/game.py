@@ -3,6 +3,7 @@ from sys import exit
 import data
 from utils import collision_check, bullet_collision_check, print_text
 import models
+from pathlib import Path
 
 class Meteorites:
     def __init__(self):
@@ -24,6 +25,15 @@ class Meteorites:
         self.player_start = pygame.sprite.GroupSingle() # the picture of the player at the start
         self.player_start.add(models.PlayerStart(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
         self.score = 0
+        self.new_high_score = False
+        Path("data").mkdir(exist_ok=True)
+        score_file = Path(data.HIGH_SCORE_FILE)
+        score_file.touch(exist_ok=True)
+        with open(score_file, "r") as f:
+            try:
+                self.high_score = int(f.readline())
+            except:
+                self.high_score = 0
         pygame.time.set_timer(self.obstacles_timer, data.ENEMIES_FREQ)
 
         
@@ -44,13 +54,14 @@ class Meteorites:
                 exit()
             if self.mode == data.Mode.RUNNING:
                 if event.type == self.obstacles_timer:
-                    self.obstacles_group.add(models.Meteorite())
+                    self.obstacles_group.add(models.Meteorite(scale=data.OBSTACLES_DEFAULT_SIZE*1))
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.bullets_group.add(self.player.sprite.shoot())
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.start_time = int(pygame.time.get_ticks()//data.SCORE_DIVIDER)
                     self.mode = data.Mode.RUNNING
+                        
                     
                 
     
@@ -60,6 +71,9 @@ class Meteorites:
         current_time = int(pygame.time.get_ticks()//data.SCORE_DIVIDER) - self.start_time
         self.score = current_time
         print_text(self.background, f"Score: {self.score}", self.font, 'tl', (data.SCORE_OFFSET, data.SCORE_OFFSET), size=0.3)
+        
+        # game gets harder
+        data.MAX_SPEED = 3 + self.score//50
         
         destroyed_obstacle = bullet_collision_check(self.bullets_group, self.obstacles_group)
         if destroyed_obstacle:
@@ -73,8 +87,18 @@ class Meteorites:
             self.obstacles_group.empty()
             self.player.empty()
             self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
+            
+            if(self.score > self.high_score):
+                self.new_high_score = True
+                self.high_score = self.score
+                with open(data.HIGH_SCORE_FILE, "w") as f:
+                    f.write(str(self.high_score))
+            else:
+                self.new_high_score = False
+                    
             self.mode = data.Mode.OVER
             self.background.fill(data.OVER_COLOR)
+
     
     def __update_screen(self):
         self.screen.blit(self.background, (0,0))
@@ -92,6 +116,10 @@ class Meteorites:
         elif self.mode == data.Mode.OVER:
             temp_rect = print_text(self.screen, f"GAME OVER", self.font)
             print_text(self.screen, f"Your Score: {self.score}", self.font, 'mt', temp_rect.midbottom, size=0.5)
+            if self.new_high_score:
+                print_text(self.screen, f"New High Score :  {self.high_score}", self.font, 'mt', (data.WIN_WIDTH//2, data.SCORE_OFFSET), size=0.4)
+            else:
+                print_text(self.screen, f"High Score:  {self.high_score}", self.font, 'mt', (data.WIN_WIDTH//2, data.SCORE_OFFSET), size=0.4)
             
         pygame.display.update()
         self.clock.tick(data.FRAME_RATE)
