@@ -55,8 +55,8 @@ def random_init():
 def collision_check(sprite, group):
     for target in group:
         if collide_mask(sprite, target):
-            return True
-    return False
+            return target
+    return None
 
 def bullet_collision_check(bullets, obstacles):
 
