@@ -1,9 +1,8 @@
 from random import randint
-from typing import Any
-from pygame import sprite, transform, key, math
-import pygame
-import data
 from utils import load_sprite, load_sound, random_init
+import data
+import pygame
+from pygame import sprite, transform, key, math
 
 
 class AdvavcedSprite(sprite.Sprite):
@@ -19,18 +18,22 @@ class AdvavcedSprite(sprite.Sprite):
         self.radius = self.image.get_width()//2
         self.rect = self.image.get_rect(center = self.pos)
         
+        
     def _move(self):
         self.pos += self.vel
         self.rect.center = round(self.pos.x), round(self.pos.y)
+       
         
     def _draw(self, surface):
         surface.blit(self.image, self.rect)
+        
         
     # OFF_SCREEN is multiplied by 2. Because if not, the sprite may be destroyed immediately after it is created    
     def _destroy(self):
         if (self.pos.x > data.WIN_WIDTH + 2*data.OFF_SCREEN or self.pos.x < -2*data.OFF_SCREEN) or ( 
             self.pos.y > data.WIN_HIGHT + 2*data.OFF_SCREEN or self.pos.y < -2*data.OFF_SCREEN):
             self.kill()
+       
             
     def update(self, surface):
         self._draw(surface)
@@ -88,6 +91,7 @@ class Player(AdvavcedSprite):
         bullet = Bullet(bullet_pos, bullet_vel)
         self.shoot_sound.play()
         return bullet
+
     
     def blink(self):
         if self.blink_time >= data.PLAYER_BLINK_TIME and self.show:
