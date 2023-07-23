@@ -24,6 +24,8 @@ PLAYER_SCALE = 0.65
 DEACCELERATION = 0.95
 ROTATION_SPEED = 4
 PLAYER_SPEED = 0.4
+PLAYER_BLINK_DELAY = 100
+PLAYER_BLINK_TIME = 20
 UP = Vector2(0, -1)
 
 # meteorites
@@ -37,6 +39,9 @@ OFF_SCREEN_RANGE = 50
 # bullets
 BULLET_SPEED = 20
 SOUND_VOLUME = 0.1
+
+# power ups
+POWER_UPS_FREQ = 15000 # ms
 
 class Mode(Enum):
     START = 0
