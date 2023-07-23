@@ -165,7 +165,7 @@ class Meteorites:
             self.player_start.draw(self.screen)
             temp_rect = self.player_start.sprite.rect
             print_text(self.screen, "Meteorites", self.font2, 'mb', temp_rect.midtop, (0,-100), color=data.TITLE_COLOR)
-            print_text(self.screen, "Press SPACE to start", self.font4, 'mt', temp_rect.midbottom, (10,50), size = 0.5)
+            print_text(self.screen, "Press SPACE to start", self.font4, 'mt', temp_rect.midbottom, (10,60), size = 0.5)
             
         elif self.mode == data.Mode.RUNNING:
             self.obstacles_group.update(self.screen)

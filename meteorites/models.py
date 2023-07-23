@@ -42,7 +42,7 @@ class AdvavcedSprite(sprite.Sprite):
     
     
 class Player(AdvavcedSprite):
-    def __init__(self, pos, name="Player_Ships/playerShip3_red", scale=data.PLAYER_SCALE):
+    def __init__(self, pos, name="Player_Ships/playerShip2_orange", scale=data.PLAYER_SCALE):
         super().__init__(name=name, scale=scale, pos=pos, vel=math.Vector2(0, 0))
         self.image_orig = self.image
         self.empty_image = load_sprite("Sprite/Empty", True)
