@@ -41,8 +41,14 @@ class AdvavcedSprite(sprite.Sprite):
 class Player(AdvavcedSprite):
     def __init__(self, pos, name="Player_Ships/playerShip3_red", scale=data.PLAYER_SCALE):
         super().__init__(name=name, scale=scale, pos=pos, vel=math.Vector2(0, 0))
+        self.image_orig = self.image
+        self.empty_image = load_sprite("Sprite/Empty", True)
         self.dir = data.UP * data.PLAYER_SPEED
         self.shoot_sound = load_sound("sfx_laser1")
+        self.shield = False
+        # blinking
+        self.show = True
+        self.blink_time = 0
     
     
     def __input_handle(self):
@@ -82,6 +88,20 @@ class Player(AdvavcedSprite):
         bullet = Bullet(bullet_pos, bullet_vel)
         self.shoot_sound.play()
         return bullet
+    
+    def blink(self):
+        if self.blink_time == data.PLAYER_BLINK_TIME:
+            self.blink_time = 0
+            return False
+        
+        self.show = not self.show
+        if not self.show:
+            self.image = self.empty_image
+        else:
+            self.image = self.image_orig
+            
+        self.blink_time += 1
+        return True
         
        
     def __draw(self, surface):
@@ -140,4 +160,18 @@ class PlayerStart(sprite.Sprite):
         self.image = transform.rotozoom(self.image, 0, data.PLAYER_START_SIZE)
         self.rect = self.image.get_rect(center = pos)
         self.pos = pos
+        
+
+class PowerUps(AdvavcedSprite):
+    def __init__(self, type_power="shield"):
+        name = "Power-ups/powerupBlue_" + type_power
+        pos = (randint(10, data.WIN_WIDTH - 10), -20)
+        vel = data.UP * -1
+        self.type = type_power
+        super().__init__(name=name, scale=1, pos=pos, vel=vel)
+        
+    def update(self, surface):
+        self._draw(surface)
+        self._move()
+        self._destroy()
 
