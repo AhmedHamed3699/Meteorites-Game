@@ -90,7 +90,7 @@ class Player(AdvavcedSprite):
         return bullet
     
     def blink(self):
-        if self.blink_time == data.PLAYER_BLINK_TIME:
+        if self.blink_time >= data.PLAYER_BLINK_TIME and self.show:
             self.blink_time = 0
             return False
         
