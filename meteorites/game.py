@@ -17,13 +17,15 @@ class Meteorites:
         self.background.fill(data.START_COLOR)
         self.font = pygame.font.Font("assets/Font/kenvector_future.ttf", data.FONT_SIZE)
         self.font2 = pygame.font.Font("assets/Font/AlienRavager.ttf", int(data.FONT_SIZE * 1.5))
+        self.font3 = pygame.font.Font("assets/Font/PixelGamingRegular.ttf", int(data.FONT_SIZE * 1.5))
+        self.font4 = pygame.font.Font("assets/Font/UglyByte.otf", int(data.FONT_SIZE * 2.3))
         self.bullets_group = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
         self.obstacles_group = pygame.sprite.Group()
         self.obstacles_timer = pygame.USEREVENT + 1
         self.player_start = pygame.sprite.GroupSingle() # the picture of the player at the start
-        self.player_start.add(models.PlayerStart(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
+        self.player_start.add(models.PlayerStart(pos = (data.WIN_WIDTH//2 - 10, data.WIN_HIGHT//2)))
         self.score = 0
         self.new_high_score = False
         Path("data").mkdir(exist_ok=True)
@@ -106,7 +108,7 @@ class Meteorites:
             self.player_start.draw(self.screen)
             temp_rect = self.player_start.sprite.rect
             print_text(self.screen, "Meteorites", self.font2, 'mb', temp_rect.midtop, (0,-100), color=data.TITLE_COLOR)
-            print_text(self.screen, "Press SPACE to start", self.font, 'mt', temp_rect.midbottom, (0,50), size = 0.5)
+            print_text(self.screen, "Press SPACE to start", self.font4, 'mt', temp_rect.midbottom, (10,50), size = 0.5)
             
         elif self.mode == data.Mode.RUNNING:
             self.player.update(self.screen)
@@ -114,13 +116,12 @@ class Meteorites:
             self.bullets_group.update(self.screen)
             
         elif self.mode == data.Mode.OVER:
-            temp_rect = print_text(self.screen, f"GAME OVER", self.font)
-            print_text(self.screen, f"Your Score: {self.score}", self.font, 'mt', temp_rect.midbottom, size=0.5)
+            temp_rect = print_text(self.screen, f"GAME OVER", self.font3, color=(207, 33, 41))
+            print_text(self.screen, f"Your Score: {self.score}", self.font, 'mt', temp_rect.midbottom, (0,data.SCORE_OFFSET), size=0.5)
             if self.new_high_score:
                 print_text(self.screen, f"New High Score :  {self.high_score}", self.font, 'mt', (data.WIN_WIDTH//2, data.SCORE_OFFSET), size=0.4)
             else:
-                print_text(self.screen, f"High Score:  {self.high_score}", self.font, 'mt', (data.WIN_WIDTH//2, data.SCORE_OFFSET), size=0.4)
-            
+                print_text(self.screen, f"High Score:  {self.high_score}", self.font, 'mt', (data.WIN_WIDTH//2, data.SCORE_OFFSET), size=0.4)           
         pygame.display.update()
         self.clock.tick(data.FRAME_RATE)
         
