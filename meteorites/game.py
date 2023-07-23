@@ -3,6 +3,7 @@ from sys import exit
 import data
 from utils import collision_check, bullet_collision_check, print_text
 import models
+from random import choice
 from pathlib import Path
 
 class Meteorites:
@@ -24,6 +25,8 @@ class Meteorites:
         self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
         self.obstacles_group = pygame.sprite.Group()
         self.obstacles_timer = pygame.USEREVENT + 1
+        self.power_ups_group = pygame.sprite.Group()
+        self.power_ups_timer = pygame.USEREVENT + 2
         self.player_start = pygame.sprite.GroupSingle() # the picture of the player at the start
         self.player_start.add(models.PlayerStart(pos = (data.WIN_WIDTH//2 - 10, data.WIN_HIGHT//2)))
         self.score = 0
@@ -37,6 +40,10 @@ class Meteorites:
             except:
                 self.high_score = 0
         pygame.time.set_timer(self.obstacles_timer, data.ENEMIES_FREQ)
+        pygame.time.set_timer(self.power_ups_timer, data.POWER_UPS_FREQ)   
+        # blinking
+        self.change_time = 0
+        self.blink = False
 
         
     def main_loop(self):
@@ -59,6 +66,8 @@ class Meteorites:
                     self.obstacles_group.add(models.Meteorite(scale=data.OBSTACLES_DEFAULT_SIZE*1))
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.bullets_group.add(self.player.sprite.shoot())
+                if event.type == self.power_ups_timer and choice([True, False, False]):
+                    self.power_ups_group.add(models.PowerUps())
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.start_time = int(pygame.time.get_ticks()//data.SCORE_DIVIDER)
@@ -77,29 +86,48 @@ class Meteorites:
         # game gets harder
         data.MAX_SPEED = 3 + self.score//50
         
+        if pygame.time.get_ticks() >= self.change_time and self.blink:
+            self.change_time = pygame.time.get_ticks() + data.PLAYER_BLINK_DELAY
+            if not self.player.sprite.blink():
+                self.blink = False
+                self.change_time = 0
+        
         destroyed_obstacle = bullet_collision_check(self.bullets_group, self.obstacles_group)
         if destroyed_obstacle:
             new_obstacles = destroyed_obstacle.split()
             if new_obstacles:
                 self.obstacles_group.add(new_obstacles)
             destroyed_obstacle.kill()
-            
-        if collision_check(self.player.sprite, self.obstacles_group):
-            self.bullets_group.empty()
-            self.obstacles_group.empty()
-            self.player.empty()
-            self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
-            
-            if(self.score > self.high_score):
-                self.new_high_score = True
-                self.high_score = self.score
-                with open(data.HIGH_SCORE_FILE, "w") as f:
-                    f.write(str(self.high_score))
-            else:
-                self.new_high_score = False
-                    
-            self.mode = data.Mode.OVER
-            self.background.fill(data.OVER_COLOR)
+        
+        power_up = collision_check(self.player.sprite, self.power_ups_group)
+        if power_up:
+            if power_up.type == "shield":
+                self.player.sprite.shield = True
+            power_up.kill()
+        
+        obstacle = collision_check(self.player.sprite, self.obstacles_group)
+        if obstacle:
+            if self.player.sprite.shield:
+                obstacle.kill()
+                self.player.sprite.shield = False
+                self.blink = True
+            elif not self.blink:
+                self.bullets_group.empty()
+                self.obstacles_group.empty()
+                self.power_ups_group.empty()
+                self.player.empty()
+                self.player.add(models.Player(pos = (data.WIN_WIDTH//2, data.WIN_HIGHT//2)))
+                
+                if(self.score > self.high_score):
+                    self.new_high_score = True
+                    self.high_score = self.score
+                    with open(data.HIGH_SCORE_FILE, "w") as f:
+                        f.write(str(self.high_score))
+                else:
+                    self.new_high_score = False
+                        
+                self.mode = data.Mode.OVER
+                self.background.fill(data.OVER_COLOR)
 
     
     def __update_screen(self):
@@ -111,8 +139,9 @@ class Meteorites:
             print_text(self.screen, "Press SPACE to start", self.font4, 'mt', temp_rect.midbottom, (10,50), size = 0.5)
             
         elif self.mode == data.Mode.RUNNING:
-            self.player.update(self.screen)
             self.obstacles_group.update(self.screen)
+            self.power_ups_group.update(self.screen)
+            self.player.update(self.screen)
             self.bullets_group.update(self.screen)
             
         elif self.mode == data.Mode.OVER:
