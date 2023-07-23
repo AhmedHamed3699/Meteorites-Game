@@ -1,7 +1,7 @@
 from sys import exit
 from random import choice
 from pathlib import Path
-from utils import collision_check, bullet_collision_check, print_text, load_sound
+from utils import collision_check, bullet_collision_check, print_text, load_sound, load_sprite
 import models
 import data
 import pygame
@@ -11,6 +11,7 @@ class Meteorites:
         pygame.init()
         self.screen = pygame.display.set_mode((data.WIN_WIDTH, data.WIN_HIGHT))
         pygame.display.set_caption("Meteorites")
+        pygame.display.set_icon(load_sprite("Sprite/icon"))
         self.clock = pygame.time.Clock()
         self.start_time = 0
         self.mode = data.Mode.START
